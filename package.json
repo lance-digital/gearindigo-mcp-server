@@ -1,0 +1,43 @@
+{
+  "name": "@gearindigo/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for GEAR.indigo Biz - Access your design documents from Claude Desktop",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "gearindigo-mcp-server": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "npx tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "gearindigo",
+    "design-documents",
+    "anthropic"
+  ],
+  "author": "GEAR.indigo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lance-digital/gearindigo-mcp-server.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
