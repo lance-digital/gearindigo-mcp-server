@@ -30,7 +30,7 @@
   "mcpServers": {
     "gear-indigo-biz": {
       "command": "npx",
-      "args": ["-y", "@gearindigo/mcp-server"],
+      "args": ["-y", "@lance-digital/gearindigo-mcp-server"],
       "env": {
         "GEAR_INDIGO_API_KEY": "YOUR_API_KEY"
       }
@@ -48,7 +48,7 @@
   "mcpServers": {
     "gear-indigo-biz": {
       "command": "npx",
-      "args": ["-y", "@gearindigo/mcp-server"],
+      "args": ["-y", "@lance-digital/gearindigo-mcp-server"],
       "env": {
         "GEAR_INDIGO_API_KEY": "YOUR_API_KEY"
       }
@@ -66,7 +66,7 @@
   "mcpServers": {
     "gear-indigo-biz": {
       "command": "npx",
-      "args": ["-y", "@gearindigo/mcp-server"],
+      "args": ["-y", "@lance-digital/gearindigo-mcp-server"],
       "env": {
         "GEAR_INDIGO_API_KEY": "YOUR_API_KEY"
       }

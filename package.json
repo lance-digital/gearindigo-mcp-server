@@ -1,5 +1,5 @@
 {
-  "name": "@gearindigo/mcp-server",
+  "name": "@lance-digital/gearindigo-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for GEAR.indigo Biz - Access your design documents from Claude Desktop",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lance-digital/gearindigo-mcp-server.git"
+    "url": "git+https://github.com/lance-digital/gearindigo-mcp-server.git"
   },
   "engines": {
     "node": ">=18.0.0"
