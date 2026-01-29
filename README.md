@@ -1,6 +1,6 @@
 # GEAR.indigo MCP Server
 
-[GEAR.indigo Biz](https://biz.gearindigo.app)で作成した設計ドキュメントにClaude Desktopからアクセスするための[MCP (Model Context Protocol)](https://modelcontextprotocol.io/) サーバーです。
+[GEAR.indigo Biz](https://biz.gearindigo.app)で作成した設計ドキュメントにアクセスするための[MCP (Model Context Protocol)](https://modelcontextprotocol.io/) サーバーです。
 
 ## 機能
 
@@ -19,9 +19,47 @@
 3. 「APIキーを生成」をクリック
 4. 表示されたAPIキーをコピー（一度だけ表示されます）
 
-### 2. Claude Desktopの設定
+### 2. MCPクライアントの設定
 
-`~/Library/Application Support/Claude/claude_desktop_config.json` に以下を追加:
+#### Claude Desktop
+
+`~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) または `%APPDATA%\Claude\claude_desktop_config.json` (Windows) に以下を追加:
+
+```json
+{
+  "mcpServers": {
+    "gear-indigo-biz": {
+      "command": "npx",
+      "args": ["-y", "@gearindigo/mcp-server"],
+      "env": {
+        "GEAR_INDIGO_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+#### Cursor
+
+`.cursor/mcp.json` に以下を追加:
+
+```json
+{
+  "mcpServers": {
+    "gear-indigo-biz": {
+      "command": "npx",
+      "args": ["-y", "@gearindigo/mcp-server"],
+      "env": {
+        "GEAR_INDIGO_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+#### Claude Code (CLI)
+
+`~/.claude/settings.json` に以下を追加:
 
 ```json
 {
@@ -39,13 +77,13 @@
 
 `YOUR_API_KEY` を取得したAPIキーに置き換えてください。
 
-### 3. Claude Desktopを再起動
+### 3. クライアントを再起動
 
-設定を反映するため、Claude Desktopを再起動してください。
+設定を反映するため、使用しているMCPクライアントを再起動してください。
 
 ## 使用例
 
-Claude Desktopで以下のように使用できます：
+MCPクライアントで以下のように使用できます：
 
 - 「GEAR.indigoのプロジェクト一覧を見せて」
 - 「○○プロジェクトの成果物一覧を取得して」
