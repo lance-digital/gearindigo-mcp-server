@@ -2,15 +2,21 @@ import { z } from "zod";
 import type { ArtifactTarget } from "../api-client.js";
 
 /**
+ * ID 形式の制約。URL パスに直接埋め込むため、パス区切りや
+ * パーセントエンコードを含む値（path traversal）を拒否する。
+ */
+export const idSchema = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]+$/, "IDは英数字・ハイフン・アンダースコアのみ使用できます");
+
+/**
  * 全ツール共通: 成果物の所属先（projectId か codebaseId のどちらか一方）を表す引数。
  */
 export const targetShape = {
-  projectId: z
-    .string()
+  projectId: idSchema
     .optional()
     .describe("プロジェクトID（projectId か codebaseId のどちらか一方を指定）"),
-  codebaseId: z
-    .string()
+  codebaseId: idSchema
     .optional()
     .describe("コードベースID（projectId か codebaseId のどちらか一方を指定）"),
 };
