@@ -3,7 +3,7 @@
 [GEAR.indigo Biz](https://biz.gearindigo.app) で作成した設計ドキュメント（成果物）にアクセスするための [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) サーバーです。
 
 GEAR.indigo Biz の `/api/v1` REST API を Personal Access Token (PAT) で叩く薄いクライアントで、
-[`gibiz` Claude Code プラグイン](https://github.com/lance-digital)（bash CLI）と **同じ API・同じトークン** を使います。
+`gibiz` Claude Code プラグイン（bash CLI）と **同じ API・同じトークン** を使います。
 プラグイン用に発行した `dg_...` トークン（`GIBIZ_API_TOKEN`）をそのまま流用できます。
 
 ## 機能
