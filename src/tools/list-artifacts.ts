@@ -1,46 +1,47 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { GearIndigoApiClient } from "../api-client.js";
+import { dateOnly, statusLabel, targetShape, toTarget } from "./shared.js";
 
 export function registerListArtifactsTool(server: McpServer): void {
   server.tool(
     "list_artifacts",
-    "指定したプロジェクトの成果物一覧を取得します",
+    "指定したプロジェクトまたはコードベースの成果物一覧を取得します（既定はコンテンツ抜きの軽量メタデータ）",
     {
-      projectId: z.string().describe("プロジェクトID"),
+      ...targetShape,
       phase: z
-        .enum(["requirements", "basic_design", "detailed_design", "testing", "summary"])
+        .enum(["requirements", "basic_design", "detailed_design", "testing"])
         .optional()
-        .describe("フェーズでフィルタリング"),
-      status: z
-        .enum(["draft", "approved", "rejected"])
+        .describe("フェーズでフィルタ（プロジェクトのみ。コードベースでは無視）"),
+      type: z.string().optional().describe("成果物タイプでフィルタ（例: project_overview）"),
+      includeContent: z
+        .boolean()
         .optional()
-        .describe("ステータスでフィルタリング"),
+        .describe("コンテンツ本文も含める（トークン消費大。既定は含めない）"),
     },
-    async ({ projectId, phase, status }) => {
+    async ({ projectId, codebaseId, phase, type, includeContent }) => {
       const client = GearIndigoApiClient.fromEnv();
-      const result = await client.listArtifacts(projectId, { phase, status });
-
-      const statusLabels: Record<string, string> = {
-        draft: "下書き",
-        approved: "承認済み",
-        rejected: "却下",
-      };
+      const result = await client.listArtifacts(toTarget({ projectId, codebaseId }), {
+        phase,
+        type,
+        includeContent,
+      });
 
       const artifactList = result.artifacts
         .map(
           (a) =>
-            `- **${a.title}** (ID: ${a.id})\n  タイプ: ${a.type}\n  ステータス: ${statusLabels[a.status] || a.status}\n  バージョン: ${a.version}\n  更新日: ${a.updatedAt}`
+            `- **${a.title}** (ID: ${a.id})\n  タイプ: ${a.type}\n  ステータス: ${statusLabel(a.status)}\n  バージョン: ${a.version}\n  更新日: ${dateOnly(a.updatedAt)}`
         )
         .join("\n\n");
 
+      const text = [
+        `## 成果物一覧 (${result.artifacts.length}件)`,
+        ``,
+        artifactList || "成果物がありません",
+      ].join("\n");
+
       return {
-        content: [
-          {
-            type: "text" as const,
-            text: `## 成果物一覧 (${result.total}件)\n\nプロジェクトID: ${result.projectId}\n\n${artifactList || "成果物がありません"}`,
-          },
-        ],
+        content: [{ type: "text" as const, text }],
       };
     }
   );
