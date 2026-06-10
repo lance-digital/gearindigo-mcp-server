@@ -1,40 +1,54 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { GearIndigoApiClient } from "../api-client.js";
+import { statusLabel, targetShape, toTarget } from "./shared.js";
 
 export function registerSearchArtifactsTool(server: McpServer): void {
   server.tool(
     "search_artifacts",
-    "成果物をキーワードで検索します（タイトルとコンテンツを検索）",
+    "プロジェクトまたはコードベースの成果物をキーワード全文検索し、マッチ箇所のスニペット（前後3行）を返します",
     {
-      query: z.string().describe("検索キーワード"),
-      projectId: z.string().optional().describe("特定のプロジェクトに限定する場合のプロジェクトID"),
-      limit: z.number().optional().describe("取得件数（デフォルト: 20）"),
+      query: z.string().min(1).max(500).describe("検索キーワード（1〜500文字、大小文字区別なし）"),
+      ...targetShape,
+      phase: z
+        .enum(["requirements", "basic_design", "detailed_design", "testing"])
+        .optional()
+        .describe("フェーズでフィルタ（プロジェクトのみ。コードベースでは無視）"),
+      type: z.string().optional().describe("成果物タイプでフィルタ"),
+      maxResults: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .optional()
+        .describe("最大結果数（1〜50、既定 10）"),
     },
-    async ({ query, projectId, limit }) => {
+    async ({ query, projectId, codebaseId, phase, type, maxResults }) => {
       const client = GearIndigoApiClient.fromEnv();
-      const result = await client.searchArtifacts({ query, projectId, limit });
+      const result = await client.searchArtifacts(toTarget({ projectId, codebaseId }), {
+        query,
+        phase,
+        type,
+        maxResults,
+      });
 
-      const statusLabels: Record<string, string> = {
-        draft: "下書き",
-        approved: "承認済み",
-        rejected: "却下",
-      };
-
-      const artifactList = result.artifacts
-        .map(
-          (a) =>
-            `### ${a.title}\n- **ID**: ${a.id}\n- **プロジェクト**: ${a.project.name}\n- **タイプ**: ${a.type}\n- **ステータス**: ${statusLabels[a.status] || a.status}\n- **プレビュー**: ${a.contentPreview}`
-        )
+      const resultBlocks = result.results
+        .map((r) => {
+          const snippets = r.snippets
+            .map((s) => `  - L${s.lineNumber}: ${s.text}`)
+            .join("\n");
+          return `### ${r.title}\n- **ID**: ${r.id}\n- **タイプ**: ${r.type}\n- **ステータス**: ${statusLabel(r.status)}\n- **バージョン**: ${r.version}\n- **マッチ箇所**:\n${snippets || "  （スニペットなし）"}`;
+        })
         .join("\n\n");
 
+      const text = [
+        `## 検索結果: "${query}" (${result.total}件)`,
+        ``,
+        resultBlocks || "該当する成果物がありません",
+      ].join("\n");
+
       return {
-        content: [
-          {
-            type: "text" as const,
-            text: `## 検索結果: "${result.query}" (${result.total}件)\n\n${artifactList || "該当する成果物がありません"}`,
-          },
-        ],
+        content: [{ type: "text" as const, text }],
       };
     }
   );

@@ -1,7 +1,7 @@
 {
   "name": "@lance-digital/gearindigo-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for GEAR.indigo Biz - Access your design documents from Claude Desktop",
+  "version": "1.1.0",
+  "description": "MCP server for GEAR.indigo Biz - read your design documents (artifacts) via the v1 REST API with a Personal Access Token",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -10,6 +10,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "npx tsx src/index.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -34,7 +37,8 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.0"
   },
   "files": [
     "dist",
