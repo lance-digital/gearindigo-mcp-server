@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { GearIndigoApiClient, validateApiUrl } from "./api-client.js";
 
 function mockResponse(status: number, body: unknown): Response {
@@ -31,6 +31,30 @@ describe("validateApiUrl", () => {
     expect(() => validateApiUrl("https://user:pass@example.com")).toThrow(/userinfo/);
     expect(() => validateApiUrl("https:///path")).toThrow(/host is required/);
     expect(() => validateApiUrl("ftp://example.com")).toThrow(/scheme/);
+  });
+});
+
+describe("GearIndigoApiClient.fromEnv", () => {
+  const saved = { url: process.env.GIBIZ_API_URL, token: process.env.GIBIZ_API_TOKEN };
+  afterEach(() => {
+    process.env.GIBIZ_API_URL = saved.url;
+    process.env.GIBIZ_API_TOKEN = saved.token;
+  });
+
+  it("requires GIBIZ_API_TOKEN", () => {
+    delete process.env.GIBIZ_API_TOKEN;
+    expect(() => GearIndigoApiClient.fromEnv()).toThrow(/GIBIZ_API_TOKEN/);
+  });
+
+  it("defaults GIBIZ_API_URL to the production host when unset", async () => {
+    delete process.env.GIBIZ_API_URL;
+    process.env.GIBIZ_API_TOKEN = "dg_x";
+    const client = GearIndigoApiClient.fromEnv();
+    const fetchFn = vi.fn().mockResolvedValue(mockResponse(200, { authMethod: "pat" }));
+    // @ts-expect-error inject mock fetch for assertion
+    client["fetchFn"] = fetchFn;
+    await client.whoami();
+    expect(new URL(fetchFn.mock.calls[0][0]).origin).toBe("https://biz.gearindigo.app");
   });
 });
 

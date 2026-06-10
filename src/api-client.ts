@@ -6,6 +6,9 @@
  * GIBIZ_API_URL / GIBIZ_API_TOKEN を使うため、プラグイン用の設定をそのまま流用できる。
  */
 
+/** GIBIZ_API_URL 未設定時のデフォルト（GEAR.indigo Biz 本番）。 */
+const DEFAULT_API_URL = "https://biz.gearindigo.app";
+
 /** 成果物の所属先。projectId と codebaseId はどちらか一方のみ指定する。 */
 export interface ArtifactTarget {
   projectId?: string;
@@ -68,12 +71,9 @@ export class GearIndigoApiClient {
 
   /** 環境変数 (GIBIZ_API_URL / GIBIZ_API_TOKEN) から生成する。 */
   static fromEnv(): GearIndigoApiClient {
-    const apiUrl = process.env.GIBIZ_API_URL?.trim();
+    const apiUrl = process.env.GIBIZ_API_URL?.trim() || DEFAULT_API_URL;
     const apiToken = process.env.GIBIZ_API_TOKEN?.trim();
 
-    if (!apiUrl) {
-      throw new Error("GIBIZ_API_URL environment variable is required");
-    }
     if (!apiToken) {
       throw new Error("GIBIZ_API_TOKEN environment variable is required");
     }
