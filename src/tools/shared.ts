@@ -1,0 +1,44 @@
+import { z } from "zod";
+import type { ArtifactTarget } from "../api-client.js";
+
+/**
+ * 全ツール共通: 成果物の所属先（projectId か codebaseId のどちらか一方）を表す引数。
+ */
+export const targetShape = {
+  projectId: z
+    .string()
+    .optional()
+    .describe("プロジェクトID（projectId か codebaseId のどちらか一方を指定）"),
+  codebaseId: z
+    .string()
+    .optional()
+    .describe("コードベースID（projectId か codebaseId のどちらか一方を指定）"),
+};
+
+export function toTarget(args: { projectId?: string; codebaseId?: string }): ArtifactTarget {
+  return { projectId: args.projectId, codebaseId: args.codebaseId };
+}
+
+/** ステータスの日本語ラベル（project: draft/approved/changes_requested, codebase: draft/accepted）。 */
+const STATUS_LABELS: Record<string, string> = {
+  draft: "下書き",
+  approved: "承認済み",
+  changes_requested: "修正依頼",
+  accepted: "確定",
+  rejected: "却下",
+};
+
+export function statusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status;
+}
+
+/** content が文字列でなければ JSON 文字列化する（codebase 成果物は JSON）。 */
+export function contentToString(content: unknown): string {
+  if (content === null || content === undefined) return "";
+  return typeof content === "string" ? content : JSON.stringify(content, null, 2);
+}
+
+/** ISO 日時の先頭 10 文字 (YYYY-MM-DD)。 */
+export function dateOnly(value: string | undefined): string {
+  return (value ?? "").slice(0, 10);
+}
