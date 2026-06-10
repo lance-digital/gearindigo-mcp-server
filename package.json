@@ -28,6 +28,13 @@
     "type": "git",
     "url": "git+https://github.com/lance-digital/gearindigo-mcp-server.git"
   },
+  "homepage": "https://github.com/lance-digital/gearindigo-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/lance-digital/gearindigo-mcp-server/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
