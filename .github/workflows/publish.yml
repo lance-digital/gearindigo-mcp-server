@@ -1,0 +1,48 @@
+name: Publish to npm
+
+# v* タグ（例: v1.1.0）の push で npm に公開する。
+# 認証は npm Trusted Publishing (OIDC) を使うため NPM_TOKEN は不要。
+#   事前に npmjs.com のパッケージ設定で Trusted Publisher を登録しておくこと:
+#     Publisher: GitHub Actions
+#     Repository: lance-digital/gearindigo-mcp-server
+#     Workflow:   publish.yml
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC Trusted Publishing / provenance に必要
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+
+      # Trusted Publishing は npm >= 11.5.1 が必要
+      - run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      - run: npm run test:run
+
+      # package.json の version とタグ (v1.2.3 → 1.2.3) の一致を検証
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME (=$TAG_VERSION) does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      # prepublishOnly で build が走る。provenance は Trusted Publishing で自動付与。
+      - run: npm publish
