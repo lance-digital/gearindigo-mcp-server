@@ -148,6 +148,21 @@ export class GearIndigoApiClient {
       : `/codebases/${target.codebaseId}`;
   }
 
+  // プロジェクト一覧取得
+  async listProjects(): Promise<{
+    projects: Array<{
+      id: string;
+      name: string;
+      phase: string;
+      organizationId: string | null;
+      codebaseId: string | null;
+      updatedAt: string;
+      createdAt: string;
+    }>;
+  }> {
+    return this.request("/projects");
+  }
+
   // 認証確認
   async whoami(): Promise<{
     user: { id: string; email: string; name: string | null };

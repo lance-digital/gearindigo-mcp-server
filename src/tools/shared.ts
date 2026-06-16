@@ -44,6 +44,17 @@ export function contentToString(content: unknown): string {
   return typeof content === "string" ? content : JSON.stringify(content, null, 2);
 }
 
+const PHASE_LABELS: Record<string, string> = {
+  requirements: "要件定義",
+  basic_design: "基本設計",
+  detailed_design: "詳細設計",
+  testing: "テスト",
+};
+
+export function phaseLabel(phase: string): string {
+  return PHASE_LABELS[phase] ?? phase;
+}
+
 /** ISO 日時の先頭 10 文字 (YYYY-MM-DD)。 */
 export function dateOnly(value: string | undefined): string {
   return (value ?? "").slice(0, 10);

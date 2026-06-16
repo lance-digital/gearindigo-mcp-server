@@ -136,4 +136,37 @@ describe("GearIndigoApiClient", () => {
     const client = new GearIndigoApiClient(config, fetchFn as unknown as typeof fetch);
     await expect(client.whoami()).rejects.toThrow(/Connection failed/);
   });
+
+  it("fetches /api/v1/projects and returns the projects array", async () => {
+    const mockProjects = {
+      projects: [
+        {
+          id: "p1",
+          name: "テストプロジェクト",
+          phase: "requirements",
+          organizationId: "org1",
+          codebaseId: null,
+          updatedAt: "2026-06-01T00:00:00.000Z",
+          createdAt: "2026-05-01T00:00:00.000Z",
+        },
+      ],
+    };
+    const fetchFn = vi.fn().mockResolvedValue(mockResponse(200, mockProjects));
+    const client = new GearIndigoApiClient(config, fetchFn as unknown as typeof fetch);
+
+    const result = await client.listProjects();
+    expect(result.projects).toHaveLength(1);
+    expect(result.projects[0].name).toBe("テストプロジェクト");
+    const [url, init] = fetchFn.mock.calls[0];
+    expect(new URL(url).pathname).toBe("/api/v1/projects");
+    expect((init.headers as Record<string, string>).Authorization).toBe("Bearer dg_secret");
+  });
+
+  it("returns empty array when there are no projects", async () => {
+    const fetchFn = vi.fn().mockResolvedValue(mockResponse(200, { projects: [] }));
+    const client = new GearIndigoApiClient(config, fetchFn as unknown as typeof fetch);
+
+    const result = await client.listProjects();
+    expect(result.projects).toHaveLength(0);
+  });
 });

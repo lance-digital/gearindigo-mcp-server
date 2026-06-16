@@ -9,6 +9,7 @@ GEAR.indigo Biz の `/api/v1` REST API を Personal Access Token (PAT) で叩く
 ## 機能
 
 - **whoami**: トークン検証・認証ユーザー / スコープの確認（401/403 の切り分け用）
+- **list_projects**: 所属組織のプロジェクト一覧の取得（ID 確認に便利）
 - **list_artifacts**: 成果物一覧の取得（既定はコンテンツ抜きの軽量メタデータ）
 - **get_artifact**: 成果物コンテンツの取得（`summary` / `metadataOnly` でトークン節約可能）
 - **search_artifacts**: 成果物のキーワード全文検索（マッチ箇所のスニペット返却）
@@ -71,6 +72,7 @@ claude mcp add --transport stdio \
 ## 使用例
 
 - 「GEAR.indigo の認証を確認して」（whoami）
+- 「アクセスできるプロジェクトを一覧で見せて」（list_projects）
 - 「プロジェクト `<projectId>` の成果物一覧を見せて」
 - 「成果物 `<artifactId>` の中身を要約して」（summary）
 - 「`<projectId>` でユーザー認証に関する記述を検索して」
@@ -84,9 +86,10 @@ claude mcp add --transport stdio \
 
 ## トークン節約のコツ
 
-1. `list_artifacts` で何があるか把握
-2. `search_artifacts` でキーワードから当たりを付ける
-3. `get_artifact` を `metadataOnly` → `summary`(`lines: 50`) → `summary`(`lines: 200`) → 全文 の順で
+1. `list_projects` でプロジェクト ID を確認
+2. `list_artifacts` で何があるか把握
+3. `search_artifacts` でキーワードから当たりを付ける
+4. `get_artifact` を `metadataOnly` → `summary`(`lines: 50`) → `summary`(`lines: 200`) → 全文 の順で
 
 ## ローカル開発
 
